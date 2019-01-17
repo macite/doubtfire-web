@@ -3,8 +3,7 @@ FROM noonat/ruby-node
 RUN mkdir /doubtfire-web
 WORKDIR /doubtfire-web
 
-EXPOSE 8000
-EXPOSE 8080
+EXPOSE 4200
 
 ENV NODE_ENV docker
 
