@@ -155,7 +155,7 @@
     "protractor": "~7.0.0",
     "sass": "^1.48.0",
     "ts-node": "~10.1.0",
-    "typescript": "~4.5.4",
+    "typescript": "~4.6.4",
     "underscore": "^1.8.3"
   }
 }
