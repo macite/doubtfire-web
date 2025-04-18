@@ -1,13 +1,15 @@
 <div class="w-full h-full" *ngIf="project$ | async as project">
   <div class="flex flex-row">
-    <f-unit-task-list
-      class="min-w-[300px] w-1/2"
-      *ngIf="project.unit.taskDefinitions.length > 0"
-      [mode]="'project'"
-      [taskDefinitions]="project.unit.taskDefinitions"
-      [tasks]="project.tasks"
-      [selectedTaskDefinition$]="selectedTaskDefinition$"
-    ></f-unit-task-list>
+    <div id="leftcomponent" #leftcomponent class="task-list task-panel">
+      <f-unit-task-list
+        class="min-w-[300px] w-1/2"
+        *ngIf="project.unit.taskDefinitions.length > 0"
+        [mode]="'project'"
+        [taskDefinitions]="project.unit.taskDefinitions"
+        [tasks]="project.tasks"
+        [selectedTaskDefinition$]="selectedTaskDefinition$"
+      ></f-unit-task-list>
+    </div>
 
     @if (subs$ | async) {
       <div
@@ -16,9 +18,9 @@
         class="resizer"
         cdkDragLockAxis="x"
         cdkDrag
-        (cdkDragMoved)="dragging($event, leftComponent)"
-        (cdkDragEnded)="stoppedDragging($event, leftComponent)"
-        (cdkDragStarted)="startedDragging($event, leftComponent)"
+        (cdkDragMoved)="dragging($event, leftcomponent)"
+        (cdkDragEnded)="stoppedDragging($event, leftcomponent)"
+        (cdkDragStarted)="startedDragging($event, leftcomponent)"
       ></div>
     }
 
@@ -26,6 +28,7 @@
       class="w-full"
       [project$]="project$"
       [selectedTaskDefinition$]="selectedTaskDefinition$"
+      [hidden]="selectedTaskDefinition"
     ></f-project-progress-dashboard>
   </div>
 </div>

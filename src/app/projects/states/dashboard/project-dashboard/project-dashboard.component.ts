@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {CdkDragEnd, CdkDragMove, CdkDragStart} from '@angular/cdk/drag-drop';
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
@@ -19,7 +19,7 @@ import {Project, TaskDefinition} from 'src/app/api/models/doubtfire-model';
 @Component({
   selector: 'f-project-dashboard',
   templateUrl: './project-dashboard.component.html',
-  styleUrl: './project-dashboard.component.css',
+  styleUrl: './project-dashboard.component.scss',
 })
 export class ProjectDashboardComponent implements OnInit {
   @Input() public project$: Observable<Project>;
@@ -28,10 +28,11 @@ export class ProjectDashboardComponent implements OnInit {
    * The currently selected task definition - selected in the unit task list.
    * This is crated here, and passed to children to interact with and share across context.
    */
-  public selectedTaskDefinition$: BehaviorSubject<TaskDefinition> =
-    new BehaviorSubject<TaskDefinition>(null);
+  public selectedTaskDefinition$: BehaviorSubject<TaskDefinition> = new BehaviorSubject<TaskDefinition>(null);
 
-  subs$: Observable<unknown>;
+  public subs$: Observable<unknown>;
+
+  @ViewChild('leftcomponent') leftComponent: ElementRef;
 
   private leftComponentStartSize$ = new Subject<number>();
   private dragMove$ = new Subject<{event: CdkDragMove; div: HTMLDivElement}>();
@@ -75,7 +76,7 @@ export class ProjectDashboardComponent implements OnInit {
 
         let newWidth: number;
         let width: number;
-        if (moveEvent.div.id === 'inboxpanel') {
+        if (moveEvent.div.id === 'leftcomponent') {
           newWidth = startSize + moveEvent.event.distance.x;
 
           // if width is belo 250, snap to 50px
@@ -96,5 +97,9 @@ export class ProjectDashboardComponent implements OnInit {
     );
     this.subs$ = merge(this.dragMoveAudited$, of(true));
     window.dispatchEvent(new Event('resize'));
+  }
+
+  public get selectedTaskDefinition(): TaskDefinition {
+    return this.selectedTaskDefinition$.getValue();
   }
 }

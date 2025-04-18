@@ -9,7 +9,7 @@ import {GlobalStateService} from 'src/app/projects/states/index/global-state.ser
 @Component({
   selector: 'f-project-root-state',
   templateUrl: './project-root-state.component.html',
-  styleUrl: './project-root-state.component.css',
+  styleUrl: './project-root-state.component.scss',
 })
 export class ProjectRootStateComponent {
   @Input() public project$: Observable<Project>;
