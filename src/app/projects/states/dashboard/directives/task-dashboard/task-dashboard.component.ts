@@ -1,6 +1,5 @@
 import {
   Component,
-  Injector,
   Input,
   OnChanges,
   OnInit,
@@ -8,15 +7,18 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import {UIRouter} from '@uirouter/core';
-import * as _ from 'lodash';
+import { Subject } from 'rxjs';
 import {Task} from 'src/app/api/models/task';
 import {TaskService} from 'src/app/api/services/task.service';
 import {FileDownloaderService} from 'src/app/common/file-downloader/file-downloader.service';
 import {TaskAssessmentModalService} from 'src/app/common/modals/task-assessment-modal/task-assessment-modal.service';
 import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
-import {SelectedTaskService} from '../../selected-task.service';
-import {DashboardViews} from '../../selected-task.service';
-import {TooltipService} from '@swimlane/ngx-charts';
+
+export enum DashboardViews {
+  submission,
+  task,
+  similarity,
+}
 
 @Component({
   selector: 'f-task-dashboard',
@@ -25,22 +27,25 @@ import {TooltipService} from '@swimlane/ngx-charts';
 })
 export class TaskDashboardComponent implements OnInit, OnChanges {
   @Input() task: Task;
-  @Input() pdfUrl: string;
+
+  /**
+   * Subject reports changes to the current view.
+   */
+  @Input() currentView$: Subject<DashboardViews>;
+  public currentView: DashboardViews = DashboardViews.submission;
+
+  @Input() pdfUrl$: Subject<string>;
 
   readonly viewContainerRef: ViewContainerRef;
 
+  /**
+   * Ensure DashboardViews is available in the template
+   */
   public DashboardViews = DashboardViews;
 
   public taskStatusData: any;
   public tutor = this.router.globals.params.tutor;
-  public urls: {
-    taskSubmissionPdfAttachmentUrl: string;
-    taskFilesUrl: string;
-    taskSheetPdfUrl?: string;
-    taskSubmissionPdfUrl?: string;
-  };
   public overseerEnabledObs = this.doubtfire.IsOverseerEnabled;
-  public currentView: DashboardViews;
 
   constructor(
     private doubtfire: DoubtfireConstants,
@@ -48,14 +53,16 @@ export class TaskDashboardComponent implements OnInit, OnChanges {
     private taskAssessmentModal: TaskAssessmentModalService,
     private fileDownloader: FileDownloaderService,
     private router: UIRouter,
-    public selectedTaskService: SelectedTaskService,
   ) {
   }
 
   ngOnInit(): void {
-    this.selectedTaskService.currentView$.next(DashboardViews.submission);
-    this.selectedTaskService.currentView$.subscribe((view) => {
+    // Default to the submission view
+    // this.currentView$.next(DashboardViews.submission);
+    this.currentView$.subscribe((view) => {
       this.currentView = view;
+      this.pdfUrl$?.next(this.pdfUrl);
+      console.log(this.pdfUrl);
     });
 
     this.taskStatusData = {
@@ -70,13 +77,19 @@ export class TaskDashboardComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.task && changes.task.currentValue) {
-      this.urls = {
-        taskSheetPdfUrl: changes.task.currentValue.definition.getTaskPDFUrl(),
-        taskSubmissionPdfUrl: changes.task.currentValue.submissionUrl(),
-        taskSubmissionPdfAttachmentUrl: changes.task.currentValue.submissionUrl(true),
-        taskFilesUrl: changes.task.currentValue.submittedFilesUrl(),
-      };
+    if (changes.task) {
+      this.pdfUrl$.next(this.pdfUrl);
+    }
+  }
+
+  public get pdfUrl(): string {
+    switch(this.currentView) {
+      case DashboardViews.task:
+        return this.task?.definition.getTaskPDFUrl();
+      case DashboardViews.submission:
+        return this.task?.submissionUrl(false);
+      default:
+        return this.task?.definition.getTaskPDFUrl();
     }
   }
 
@@ -89,10 +102,10 @@ export class TaskDashboardComponent implements OnInit, OnChanges {
   }
 
   downloadSubmission() {
-    this.fileDownloader.downloadFile(this.urls.taskSubmissionPdfAttachmentUrl, 'submission.pdf');
+    this.fileDownloader.downloadFile(this.task.submissionUrl(true), 'submission.pdf');
   }
 
   downloadSubmittedFiles() {
-    this.fileDownloader.downloadFile(this.urls.taskFilesUrl, 'submitted-files.zip');
+    this.fileDownloader.downloadFile(this.task.submittedFilesUrl(true), 'submitted-files.zip');
   }
 }

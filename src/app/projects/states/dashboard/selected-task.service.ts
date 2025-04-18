@@ -3,12 +3,7 @@ import {BehaviorSubject, Subject} from 'rxjs';
 import {Task} from 'src/app/api/models/task';
 import {TaskService} from 'src/app/api/services/task.service';
 import {GlobalStateService} from '../index/global-state.service';
-
-export enum DashboardViews {
-  submission,
-  task,
-  similarity,
-}
+import { DashboardViews } from './directives/task-dashboard/task-dashboard.component';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +24,7 @@ export class SelectedTaskService {
   }
 
   public get hasSubmissionPdf(): boolean {
-    return this.task$.value?.hasPdf;
+    return this.task$.value?.hasSubmissionPdf;
   }
 
   public checkFooterHeight() {

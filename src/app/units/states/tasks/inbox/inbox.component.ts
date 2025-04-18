@@ -9,16 +9,16 @@ import {
 } from '@angular/core';
 import {MediaObserver} from 'ng-flex-layout';
 import {UIRouter} from '@uirouter/angular';
-import {auditTime, merge, Observable, of, Subject, tap, withLatestFrom} from 'rxjs';
+import {auditTime, BehaviorSubject, merge, Observable, of, Subject, tap, withLatestFrom} from 'rxjs';
 import {Task} from 'src/app/api/models/task';
 import {Unit} from 'src/app/api/models/unit';
 import {UnitRole} from 'src/app/api/models/unit-role';
 import {FileDownloaderService} from 'src/app/common/file-downloader/file-downloader.service';
-import {SelectedTaskService} from 'src/app/projects/states/dashboard/selected-task.service';
 import {HotkeysService, HotkeysHelpComponent} from '@ngneat/hotkeys';
 import {MatDialog} from '@angular/material/dialog';
 import {UserService} from 'src/app/api/services/user.service';
 import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
+import { DashboardViews } from 'src/app/projects/states/dashboard/directives/task-dashboard/task-dashboard.component';
 
 @Component({
   selector: 'f-inbox',
@@ -28,7 +28,17 @@ import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
 export class InboxComponent implements OnInit, OnDestroy {
   @Input() unit: Unit;
   @Input() unitRole: UnitRole;
-  @Input() taskData: {selectedTask: Task; any};
+  @Input() taskData: {selectedTask: Task; };
+
+  public currentView$ = new BehaviorSubject<DashboardViews>(DashboardViews.submission);
+  public selectedTask$ = new BehaviorSubject<Task>(null);
+  private selectedTask: Task;
+
+  /**
+   * Listen for changes to the shown PDF in the task dashboard.
+   */
+  public viewedPdfUrl$: BehaviorSubject<string> = new BehaviorSubject<string>(null);
+  public pdfUrl: string;
 
   @ViewChild('inboxpanel') inboxPanel: ElementRef;
   @ViewChild('commentspanel') commentspanel: ElementRef;
@@ -42,9 +52,7 @@ export class InboxComponent implements OnInit, OnDestroy {
   protected filters;
   protected showSearchOptions;
 
-  public taskSelected = false;
-
-  visiblePdfUrl: string;
+  public taskSelected: boolean = false;
 
   get narrowTaskInbox(): boolean {
     return this.inboxPanel?.nativeElement.getBoundingClientRect().width < 150;
@@ -52,7 +60,6 @@ export class InboxComponent implements OnInit, OnDestroy {
 
   constructor(
     private hotkeys: HotkeysService,
-    private selectedTask: SelectedTaskService,
     public mediaObserver: MediaObserver,
     public fileDownloader: FileDownloaderService,
     private router: UIRouter,
@@ -60,12 +67,14 @@ export class InboxComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private constants: DoubtfireConstants,
   ) {
-    this.selectedTask.currentPdfUrl$.subscribe((url) => {
-      this.visiblePdfUrl = url;
+    this.selectedTask$.subscribe((task) => {
+      task?.getSubmissionDetails().subscribe();
+      this.selectedTask = task;
+      this.taskSelected = !!task;
     });
 
-    this.selectedTask.selectedTask$.subscribe((task) => {
-      this.taskSelected = task != null;
+    this.viewedPdfUrl$.subscribe((url) => {
+      this.pdfUrl = url;
     });
   }
 
@@ -88,7 +97,7 @@ export class InboxComponent implements OnInit, OnDestroy {
           keys: 'control.shift.f',
           description: 'Mark selected task as fix',
         })
-        .subscribe(() => this.selectedTask.selectedTask?.updateTaskStatus('fix_and_resubmit'));
+        .subscribe(() => this.selectedTask.updateTaskStatus('fix_and_resubmit'));
     }
 
     if (!registeredHotkeys.includes('control.shift.c')) {
@@ -98,7 +107,7 @@ export class InboxComponent implements OnInit, OnDestroy {
           description: 'Mark selected task as complete',
         })
         .subscribe(() =>
-          this.selectedTask.selectedTask?.updateTaskStatus('complete')
+          this.selectedTask.updateTaskStatus('complete')
       );
     }
 
@@ -108,7 +117,7 @@ export class InboxComponent implements OnInit, OnDestroy {
           keys: 'control.shift.d',
           description: 'Mark selected task as discuss',
         })
-        .subscribe(() => this.selectedTask.selectedTask?.updateTaskStatus('discuss'));
+        .subscribe(() => this.selectedTask.updateTaskStatus('discuss'));
     }
 
     this.dragMoveAudited$ = this.dragMove$.pipe(
@@ -173,10 +182,10 @@ export class InboxComponent implements OnInit, OnDestroy {
     });
   }
 
-  openPdfInNewTab(): void {
-    if (this.taskData.selectedTask.hasPdf) {
+  public openPdfInNewTab(): void {
+    if (this.pdfUrl) {
       this.fileDownloader.downloadFile(
-        this.visiblePdfUrl,
+        this.pdfUrl,
         `${this.taskData.selectedTask.definition.abbreviation}.pdf`,
       );
     }

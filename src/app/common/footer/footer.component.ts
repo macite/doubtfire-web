@@ -1,9 +1,9 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { Task } from 'src/app/api/models/task';
-import { SelectedTaskService } from 'src/app/projects/states/dashboard/selected-task.service';
 import { TaskService } from 'src/app/api/services/task.service';
 import { FileDownloaderService } from '../file-downloader/file-downloader.service';
+import { DashboardViews } from 'src/app/projects/states/dashboard/directives/task-dashboard/task-dashboard.component';
 
 @Component({
   selector: 'f-footer',
@@ -11,10 +11,11 @@ import { FileDownloaderService } from '../file-downloader/file-downloader.servic
   styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent implements OnInit {
-  constructor(public selectedTaskService: SelectedTaskService, public taskService: TaskService, private fileDownloader: FileDownloaderService) {}
+  constructor(public taskService: TaskService, private fileDownloader: FileDownloaderService) {}
 
-  selectedTask$: Observable<Task>;
+  @Input() selectedTask$: Observable<Task>;
   selectedTask: Task;
+  @Input() currentView$: Subject<DashboardViews>;
 
   @ViewChild('similaritiesButton', { static: false, read: ElementRef }) similaritiesButton: ElementRef;
   @ViewChild('warningText', { static: false, read: ElementRef }) warningText: ElementRef;
@@ -41,9 +42,6 @@ export class FooterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // watch for changes to the selected task
-    this.selectedTask$ = this.selectedTaskService.selectedTask$;
-
     this.selectedTask$.subscribe((task) => {
       this.selectedTask = task;
       // We need to timeout to give the DOM a chance to place the elements
@@ -68,14 +66,22 @@ export class FooterComponent implements OnInit {
   }
 
   viewTaskSheet() {
-    this.selectedTaskService.showTaskSheet();
+    this.currentView$.next(DashboardViews.task);
   }
 
   viewSubmission() {
-    this.selectedTaskService.showSubmission();
+    this.currentView$.next(DashboardViews.submission);
   }
 
   viewSimilarity() {
-    this.selectedTaskService.showSimilarity();
+    this.currentView$.next(DashboardViews.similarity);
+  }
+
+  public get hasTaskSheet(): boolean {
+    return this.selectedTask?.definition?.hasTaskSheet;
+  }
+
+  public get hasSubmissionPdf(): boolean {
+    return this.selectedTask?.hasSubmissionPdf;
   }
 }

@@ -4,13 +4,13 @@
   <ng-container [ngSwitch]="currentView">
     <ng-template [ngSwitchCase]="DashboardViews.task">
       <ng-container
-        *ngIf="selectedTaskService.hasTaskSheet; then pdfViewer; else noPdfUrl"
+        *ngIf="task?.hasTaskSheet; then pdfViewer; else noPdfUrl"
       ></ng-container>
     </ng-template>
 
     <ng-template [ngSwitchCase]="DashboardViews.submission">
       <ng-container
-        *ngIf="selectedTaskService.hasSubmissionPdf; then pdfViewer; else noPdfUrl"
+        *ngIf="task?.hasSubmissionPdf; then pdfViewer; else noPdfUrl"
       ></ng-container>
     </ng-template>
 

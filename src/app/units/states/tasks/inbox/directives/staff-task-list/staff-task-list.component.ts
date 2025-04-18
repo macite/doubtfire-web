@@ -24,11 +24,10 @@ import {
   Project,
   TaskDefinition,
 } from 'src/app/api/models/doubtfire-model';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {FileDownloaderService} from 'src/app/common/file-downloader/file-downloader.service';
 import {AppInjector} from 'src/app/app-injector';
 import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
-import {SelectedTaskService} from 'src/app/projects/states/dashboard/selected-task.service';
 import {AlertService} from 'src/app/common/services/alert.service';
 import {HotkeysService} from '@ngneat/hotkeys';
 
@@ -39,6 +38,8 @@ import {HotkeysService} from '@ngneat/hotkeys';
 })
 export class StaffTaskListComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('searchDialog') searchDialog: TemplateRef<any>;
+
+  @Input() selectedTask$: Subject<Task>;
 
   @Input() task: Task;
   @Input() project: Project;
@@ -101,7 +102,6 @@ export class StaffTaskListComponent implements OnInit, OnChanges, OnDestroy {
   allowHover = true;
 
   constructor(
-    private selectedTaskService: SelectedTaskService,
     private alertService: AlertService,
     private fileDownloaderService: FileDownloaderService,
     public dialog: MatDialog,
@@ -352,8 +352,8 @@ export class StaffTaskListComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  setSelectedTask(task: Task) {
-    this.selectedTaskService.setSelectedTask(task);
+  public setSelectedTask(task: Task) {
+    this.selectedTask$.next(task);
     this.taskData.selectedTask = task;
     if (this.taskData.onSelectedTaskChange) {
       this.taskData.onSelectedTaskChange(task);

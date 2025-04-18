@@ -39,10 +39,10 @@ export class TaskSubmissionCardComponent implements OnChanges, OnInit {
   reapplySubmissionData(): void {
     this.task.getSubmissionDetails().subscribe(() => {
       this.canReuploadEvidence = this.task.inSubmittedState();
-      this.canRegeneratePdf = this.taskService.pdfRegeneratableStatuses.includes(this.task.status) && this.task.hasPdf;
+      this.canRegeneratePdf = this.taskService.pdfRegeneratableStatuses.includes(this.task.status) && this.task.hasSubmissionPdf;
       this.submission = {
         isProcessing: this.task.processingPdf,
-        isUploaded: this.task.hasPdf,
+        isUploaded: this.task.hasSubmissionPdf,
       };
       this.urls = {
         pdf: this.task.submissionUrl(true),

@@ -8,6 +8,7 @@
         [taskDefinitions]="project.unit.taskDefinitions"
         [tasks]="project.tasks"
         [selectedTaskDefinition$]="selectedTaskDefinition$"
+        [selectedTask$]="selectedTask$"
       ></f-unit-task-list>
     </div>
 
@@ -32,6 +33,8 @@
     ></f-project-progress-dashboard>
   </div>
 </div>
+
+<f-task-dashboard [task]="selectedTask" *ngIf="selectedTask"></f-task-dashboard>
 
 <!--
 <div class="panel-footer">
@@ -67,7 +70,7 @@
       <h3 class="mb-0">{{ taskData?.selectedTask?.project.student.nickname }}</h3>
       <div fxFlex></div>
       <button
-        [disabled]="!this.taskData?.selectedTask?.hasPdf"
+        [disabled]="!this.taskData?.selectedTask?.hasSubmissionPdf"
         mat-icon-button
         aria-label="Open Submission"
         (click)="openPdfInNewTab()"

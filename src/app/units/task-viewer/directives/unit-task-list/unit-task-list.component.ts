@@ -17,6 +17,7 @@ export class FUnitTaskListComponent implements OnInit {
   // What is the selected task definition
   @Input() selectedTaskDefinition$: BehaviorSubject<TaskDefinition>;
   selectedTaskDef: TaskDefinition;
+  @Input() selectedTask$: BehaviorSubject<Task>;
 
   // @Output() selectedTask: EventEmitter<Task> = new EventEmitter<Task>();
 
@@ -70,18 +71,11 @@ export class FUnitTaskListComponent implements OnInit {
   setSelectedTaskDefinition(taskDef: TaskDefinition) {
     if (this.isSelectedTaskDefinition(taskDef)) {
       this.selectedTaskDefinition$.next(null);
+      this.selectedTask$.next(null);
     } else {
       this.selectedTaskDefinition$.next(taskDef);
+      this.selectedTask$.next(this.taskForTaskDef(taskDef));
     }
-
-    // this.selectedTaskDefinition.emit(taskDef);
-    // const selectedTask = this.taskForTaskDef(taskDef);
-    // if (selectedTask) {
-    //   this.selectedTask$.next(selectedTask);
-    // }
-
-    //TODO: remove
-    // this.taskViewerService.setSelectedTaskDef(taskDef);
   }
 
   public isSelectedTaskDefinition(taskDef: TaskDefinition): boolean {

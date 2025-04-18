@@ -3,6 +3,7 @@
     <div id="inboxpanel" #inboxpanel class="staff-task-list inbox-panel">
       @if (taskData) {
         <df-staff-task-list
+          [selectedTask$]="selectedTask$"
           [isNarrow]="narrowTaskInbox"
           [showSearchOptions]="showSearchOptions"
           [filters]="filters"
@@ -26,7 +27,12 @@
     }
 
     <div fxFlex class="inbox-panel">
-      <f-task-dashboard [task]="taskData.selectedTask" [pdfUrl]="visiblePdfUrl"></f-task-dashboard>
+      <f-task-dashboard
+        [task]="taskData.selectedTask"
+        [currentView$]="currentView$"
+        [pdfUrl$]="viewedPdfUrl$"
+        >
+      </f-task-dashboard>
     </div>
     <div
       id="rightResizerEl"
@@ -42,13 +48,17 @@
       <task-comments-viewer [task]="taskData.selectedTask"> </task-comments-viewer>
     </div>
   </div>
-  <f-footer></f-footer>
+  <f-footer
+    [selectedTask$]="selectedTask$"
+    [currentView$]="currentView$"
+  ></f-footer>
 </div>
 
 <div #mobile fxLayout="row" fxFill fxHide fxShow.lt-md>
   <div id="inboxpanel" #inboxpanel class="inbox-panel mobile" [hidden]="taskSelected">
     @if (taskData) {
       <df-staff-task-list
+        [selectedTask$]="selectedTask$"
         [isNarrow]="false"
         [showSearchOptions]="showSearchOptions"
         [filters]="filters"
@@ -71,7 +81,7 @@
       <h3 class="mb-0">{{ taskData?.selectedTask?.project.student.nickname }}</h3>
       <div fxFlex></div>
       <button
-        [disabled]="!this.taskData?.selectedTask?.hasPdf"
+        [disabled]="!this.pdfUrl"
         mat-icon-button
         aria-label="Open Submission"
         (click)="openPdfInNewTab()"

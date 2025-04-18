@@ -49,7 +49,7 @@ export class Task extends Entity {
   definition: TaskDefinition;
 
   //TODO: map task submission details
-  hasPdf: boolean = false;
+  hasSubmissionPdf: boolean = false;
   processingPdf: boolean = false;
 
   pinned: boolean = false;
@@ -507,7 +507,7 @@ export class Task extends Entity {
       )
       .pipe(
         map((response: object) => {
-          this.hasPdf = response['has_pdf'];
+          this.hasSubmissionPdf = response['has_pdf'];
           this.processingPdf = response['processing_pdf'];
           this.submissionDate = MappingFunctions.mapDate(response, 'submission_date', this);
           return this;

@@ -29,6 +29,7 @@ export class ProjectDashboardComponent implements OnInit {
    * This is crated here, and passed to children to interact with and share across context.
    */
   public selectedTaskDefinition$: BehaviorSubject<TaskDefinition> = new BehaviorSubject<TaskDefinition>(null);
+  public selectedTask$: BehaviorSubject<Task> = new BehaviorSubject<Task>(null);
 
   public subs$: Observable<unknown>;
 
@@ -101,5 +102,9 @@ export class ProjectDashboardComponent implements OnInit {
 
   public get selectedTaskDefinition(): TaskDefinition {
     return this.selectedTaskDefinition$.getValue();
+  }
+
+  public get selectedTask(): Task {
+    return this.selectedTask$.getValue();
   }
 }
