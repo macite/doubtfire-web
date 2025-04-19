@@ -1,8 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Grade} from 'src/app/api/models/grade';
-import {TaskDefinition, Task} from 'src/app/api/models/doubtfire-model';
+import {TaskDefinition, Task, Project} from 'src/app/api/models/doubtfire-model';
 import {TaskDefinitionNamePipe} from 'src/app/common/filters/task-definition-name.pipe';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Component({
   selector: 'f-unit-task-list',
@@ -18,6 +18,7 @@ export class FUnitTaskListComponent implements OnInit {
   @Input() selectedTaskDefinition$: BehaviorSubject<TaskDefinition>;
   selectedTaskDef: TaskDefinition;
   @Input() selectedTask$: BehaviorSubject<Task>;
+  @Input() targetGradeChange$: Observable<Project>;
 
   // @Output() selectedTask: EventEmitter<Task> = new EventEmitter<Task>();
 
@@ -28,7 +29,7 @@ export class FUnitTaskListComponent implements OnInit {
 
   applyFilters() {
     this.filteredTaskDefinitions = this.taskDefinitionNamePipe.transform(
-      this.taskDefinitions,
+      this.taskDefinitions.filter((taskDef) => this.mode === 'all-tasks' || !!this.taskForTaskDef(taskDef)),
       this.searchText,
     );
   }
@@ -51,6 +52,10 @@ export class FUnitTaskListComponent implements OnInit {
     // Watch for changes in the selected task definition... including from us
     this.selectedTaskDefinition$.subscribe((taskDef) => {
       this.selectedTaskDef = taskDef;
+    });
+
+    this.targetGradeChange$.subscribe((project) => {
+      this.applyFilters();
     });
 
     // // TODO: Remove the service

@@ -14,7 +14,7 @@ import {
 import {ProjectService} from 'src/app/api/services/project.service';
 import {GlobalStateService} from '../../index/global-state.service';
 import {UserService} from 'src/app/api/services/user.service';
-import {Project, TaskDefinition} from 'src/app/api/models/doubtfire-model';
+import {Project, TaskDefinition, Task} from 'src/app/api/models/doubtfire-model';
 
 @Component({
   selector: 'f-project-dashboard',
@@ -30,6 +30,8 @@ export class ProjectDashboardComponent implements OnInit {
    */
   public selectedTaskDefinition$: BehaviorSubject<TaskDefinition> = new BehaviorSubject<TaskDefinition>(null);
   public selectedTask$: BehaviorSubject<Task> = new BehaviorSubject<Task>(null);
+  public targetGradeChange$: BehaviorSubject<Project> = new BehaviorSubject<Project>(null);
+
 
   public subs$: Observable<unknown>;
 
@@ -39,7 +41,7 @@ export class ProjectDashboardComponent implements OnInit {
   private dragMove$ = new Subject<{event: CdkDragMove; div: HTMLDivElement}>();
   private dragMoveAudited$;
 
-  projectTasks = [];
+  public projectTasks: Task[] = [];
 
   constructor(
     private currentUser: UserService,
@@ -66,7 +68,12 @@ export class ProjectDashboardComponent implements OnInit {
   ngOnInit(): void {
     // projectTasks = this.projectService.loadProject
     this.project$.subscribe((project) => {
-      console.log(project);
+      this.projectTasks = project.activeTasks();
+    });
+
+    this.targetGradeChange$.subscribe((project) => {
+      this.projectTasks.length = 0
+      this.projectTasks.push(...project.activeTasks());
     });
 
     this.dragMoveAudited$ = this.dragMove$.pipe(

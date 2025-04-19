@@ -6,9 +6,10 @@
         *ngIf="project.unit.taskDefinitions.length > 0"
         [mode]="'project'"
         [taskDefinitions]="project.unit.taskDefinitions"
-        [tasks]="project.tasks"
+        [tasks]="projectTasks"
         [selectedTaskDefinition$]="selectedTaskDefinition$"
         [selectedTask$]="selectedTask$"
+        [targetGradeChange$]="targetGradeChange$"
       ></f-unit-task-list>
     </div>
 
@@ -29,6 +30,7 @@
       class="w-full"
       [project$]="project$"
       [selectedTaskDefinition$]="selectedTaskDefinition$"
+      [targetGradeChange$]="targetGradeChange$"
       [hidden]="selectedTaskDefinition"
     ></f-project-progress-dashboard>
   </div>
