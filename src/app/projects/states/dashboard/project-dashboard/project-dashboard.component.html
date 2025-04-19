@@ -31,12 +31,23 @@
       [project$]="project$"
       [selectedTaskDefinition$]="selectedTaskDefinition$"
       [targetGradeChange$]="targetGradeChange$"
-      [hidden]="selectedTaskDefinition"
+      [hidden]="selectedTask"
     ></f-project-progress-dashboard>
+
+    @if (selectedTask) {
+      <f-task-dashboard
+        class="inbox-panel grow"
+        [currentView$]="currentView$"
+        [task]="selectedTask">
+      </f-task-dashboard>
+      <div #commentspanel class="task-comment-panel inbox-panel">
+        <task-comments-viewer [task]="selectedTask"> </task-comments-viewer>
+      </div>
+    }
   </div>
 </div>
 
-<f-task-dashboard [task]="selectedTask" *ngIf="selectedTask"></f-task-dashboard>
+
 
 <!--
 <div class="panel-footer">

@@ -78,7 +78,7 @@ export class TaskDashboardComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.task) {
-      this.pdfUrl$.next(this.pdfUrl);
+      this.pdfUrl$?.next(this.pdfUrl);
     }
   }
 

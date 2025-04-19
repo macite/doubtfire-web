@@ -52,7 +52,7 @@
   ng-submit="addComment()"
   role="form"
 >
-  @if (task) {
+  @if (task && this.feedbackTemplatePickerAvailable) {
     <f-task-feedback-templates
       [task]="task"
       (templateSelected)="addFeedback($event)"

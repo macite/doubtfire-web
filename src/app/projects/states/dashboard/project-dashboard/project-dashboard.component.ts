@@ -15,6 +15,7 @@ import {ProjectService} from 'src/app/api/services/project.service';
 import {GlobalStateService} from '../../index/global-state.service';
 import {UserService} from 'src/app/api/services/user.service';
 import {Project, TaskDefinition, Task} from 'src/app/api/models/doubtfire-model';
+import { DashboardViews } from '../directives/task-dashboard/task-dashboard.component';
 
 @Component({
   selector: 'f-project-dashboard',
@@ -31,7 +32,7 @@ export class ProjectDashboardComponent implements OnInit {
   public selectedTaskDefinition$: BehaviorSubject<TaskDefinition> = new BehaviorSubject<TaskDefinition>(null);
   public selectedTask$: BehaviorSubject<Task> = new BehaviorSubject<Task>(null);
   public targetGradeChange$: BehaviorSubject<Project> = new BehaviorSubject<Project>(null);
-
+  public currentView$: BehaviorSubject<DashboardViews> = new BehaviorSubject<DashboardViews>(DashboardViews.task);
 
   public subs$: Observable<unknown>;
 
@@ -68,12 +69,14 @@ export class ProjectDashboardComponent implements OnInit {
   ngOnInit(): void {
     // projectTasks = this.projectService.loadProject
     this.project$.subscribe((project) => {
-      this.projectTasks = project.activeTasks();
+      this.projectTasks = project?.activeTasks();
     });
 
     this.targetGradeChange$.subscribe((project) => {
       this.projectTasks.length = 0
-      this.projectTasks.push(...project.activeTasks());
+      if (project) {
+        this.projectTasks.push(...project.activeTasks());
+      }
     });
 
     this.dragMoveAudited$ = this.dragMove$.pipe(

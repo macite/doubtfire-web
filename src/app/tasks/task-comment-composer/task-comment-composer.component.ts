@@ -254,7 +254,11 @@ export class TaskCommentComposerComponent implements DoCheck, OnChanges {
     ].join('');
   }
 
-  addFeedback(template: FeedbackTemplate): void {
+  public get feedbackTemplatePickerAvailable(): boolean {
+    return this.task?.unit.currentUserIsStaff;
+  }
+
+  public addFeedback(template: FeedbackTemplate): void {
     const char = template.commentText;
     const text = this.input.first.nativeElement.innerText;
     const position = this.caretOffset();
