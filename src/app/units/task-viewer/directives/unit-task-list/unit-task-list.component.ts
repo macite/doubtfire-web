@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {Grade} from 'src/app/api/models/grade';
 import {TaskDefinition, Task, Project} from 'src/app/api/models/doubtfire-model';
 import {TaskDefinitionNamePipe} from 'src/app/common/filters/task-definition-name.pipe';
@@ -47,8 +47,6 @@ export class FUnitTaskListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.applyFilters();
-
     // Watch for changes in the selected task definition... including from us
     this.selectedTaskDefinition$.subscribe((taskDef) => {
       this.selectedTaskDef = taskDef;
@@ -58,19 +56,7 @@ export class FUnitTaskListComponent implements OnInit {
       this.applyFilters();
     });
 
-    // // TODO: Remove the service
-    // this.taskViewerService.selectedTaskDef.subscribe((taskDef) => {
-    //   this.selectedTaskDef = taskDef;
-    // });
-
-    // this.taskViewerService.taskSelected.subscribe((taskSelected) => {
-    //   this.taskSelected = taskSelected;
-    // });
-
-    // // Select the first task definition by default
-    // if (this.taskDefinitions.length > 0) {
-    //   this.setSelectedTaskDefinition(this.taskDefinitions[0]);
-    // }
+    this.applyFilters();
   }
 
   setSelectedTaskDefinition(taskDef: TaskDefinition) {

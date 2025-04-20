@@ -3,6 +3,8 @@ import {Component, Input, Inject} from '@angular/core';
 import {Task, TaskDefinition, Unit} from 'src/app/api/models/doubtfire-model';
 import {FileDownloaderService} from 'src/app/common/file-downloader/file-downloader.service';
 import {GradeService} from 'src/app/common/services/grade.service';
+import { DashboardViews } from '../../task-dashboard.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'f-task-description-card',
@@ -13,6 +15,7 @@ export class TaskDescriptionCardComponent {
   @Input() task: Task;
   @Input() taskDef: TaskDefinition;
   @Input() unit: Unit;
+  @Input() currentView$: Subject<DashboardViews>;
 
   public grades: {names: any; acronyms: any};
 
@@ -24,6 +27,10 @@ export class TaskDescriptionCardComponent {
       names: GradeService.grades,
       acronyms: GradeService.gradeAcronyms,
     };
+  }
+
+  public viewTaskSheet() {
+    this.currentView$.next(DashboardViews.task);
   }
 
   public downloadTaskSheet() {

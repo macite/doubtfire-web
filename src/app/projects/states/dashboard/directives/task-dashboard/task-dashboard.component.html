@@ -4,7 +4,7 @@
   <ng-container [ngSwitch]="currentView">
     <ng-template [ngSwitchCase]="DashboardViews.task">
       <ng-container
-        *ngIf="task?.hasTaskSheet; then pdfViewer; else noPdfUrl"
+        *ngIf="task?.definition.hasTaskSheet; then pdfViewer; else noPdfUrl"
       ></ng-container>
     </ng-template>
 
@@ -17,11 +17,15 @@
     <ng-template [ngSwitchCase]="DashboardViews.similarity">
       <f-task-similarity-view [task]="task"></f-task-similarity-view>
     </ng-template>
+
+    <ng-template [ngSwitchCase]="DashboardViews.taskDetails">
+      <f-task-details [task]="task" [currentView$]="currentView$"></f-task-details>
+    </ng-template>
   </ng-container>
 
   <!-- The PDF Viewer -->
   <ng-template #pdfViewer>
-    <f-pdf-viewer [pdfUrl]="pdfUrl" [startPage]="2"></f-pdf-viewer>
+    <f-pdf-viewer [pdfUrl]="pdfUrl" [startPage]="startPage"></f-pdf-viewer>
   </ng-template>
 
   <!-- Render if no PDF URL is available for the current view -->

@@ -66,16 +66,24 @@ export class ProjectDashboardComponent implements OnInit {
     event.source.element.nativeElement.classList.remove('hovering');
   }
 
+  private updateProjectTasks(project: Project) {
+    this.projectTasks.length = 0
+    if (project) {
+      this.projectTasks.push(...project.activeTasks());
+    }
+  }
+
   ngOnInit(): void {
+    console.log('Project Dashboard Component');
+    this.currentView$.next(DashboardViews.taskDetails);
     // projectTasks = this.projectService.loadProject
     this.project$.subscribe((project) => {
-      this.projectTasks = project?.activeTasks();
+      this.updateProjectTasks(project);
     });
 
     this.targetGradeChange$.subscribe((project) => {
-      this.projectTasks.length = 0
       if (project) {
-        this.projectTasks.push(...project.activeTasks());
+        this.updateProjectTasks(project);
       }
     });
 

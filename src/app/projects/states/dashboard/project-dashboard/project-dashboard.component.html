@@ -38,7 +38,9 @@
       <f-task-dashboard
         class="inbox-panel grow"
         [currentView$]="currentView$"
-        [task]="selectedTask">
+        [task]="selectedTask"
+        [startPage]="1"
+        >
       </f-task-dashboard>
       <div #commentspanel class="task-comment-panel inbox-panel">
         <task-comments-viewer [task]="selectedTask"> </task-comments-viewer>

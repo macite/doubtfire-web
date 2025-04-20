@@ -15,9 +15,14 @@ import {TaskAssessmentModalService} from 'src/app/common/modals/task-assessment-
 import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
 
 export enum DashboardViews {
+  // View submission pdf
   submission,
+  // View task pdf
   task,
+  // Show similarities
   similarity,
+  // Show task details
+  taskDetails,
 }
 
 @Component({
@@ -35,6 +40,7 @@ export class TaskDashboardComponent implements OnInit, OnChanges {
   public currentView: DashboardViews = DashboardViews.submission;
 
   @Input() pdfUrl$: Subject<string>;
+  @Input() startPage: number = 2;
 
   readonly viewContainerRef: ViewContainerRef;
 
@@ -62,7 +68,7 @@ export class TaskDashboardComponent implements OnInit, OnChanges {
     this.currentView$.subscribe((view) => {
       this.currentView = view;
       this.pdfUrl$?.next(this.pdfUrl);
-      console.log(this.pdfUrl);
+      console.log('Current view:', this.currentView);
     });
 
     this.taskStatusData = {
